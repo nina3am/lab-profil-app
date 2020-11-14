@@ -43,7 +43,7 @@ const User = require('../models/User.model');
 // POST /auth/signup
 
 authRoutes.post('/signup', (req, res, next) => {
-  const { username, password, campus, course, image } = req.body;
+  const { username, password, campus, course } = req.body;
   if (!username || !password) {
     res.status(400).json({ message: 'Provide username and password' });
     return;
@@ -59,9 +59,10 @@ authRoutes.post('/signup', (req, res, next) => {
 
   const salt = bcrypt.genSaltSync(10);
   const hashPass = bcrypt.hashSync(password, salt);
-  console.log(hashPass);
 
-  User.create({ username, password: hashPass, campus, course, image })
+  console.log({ username, password, campus, course });
+
+  User.create({ username, password: hashPass, campus, course })
     .then((user) => {
       console.log('User', user);
       req.session.user = user;
@@ -99,7 +100,11 @@ authRoutes.post('/edit', (req, res, next) => {
   const { username, course, campus } = req.body;
   const id = req.session.currentUser._id;
   console.log(id);
-  User.findByIdAndUpdate({ _id: id }, {username, course, campus},{ new: true })
+  User.findByIdAndUpdate(
+    { _id: id },
+    { username, course, campus },
+    { new: true }
+  )
     .then((newUser) => {
       console.log('new user', newUser);
       res.json(newUser);
